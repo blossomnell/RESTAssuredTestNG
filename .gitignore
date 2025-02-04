@@ -1,0 +1,3 @@
+# Ignore test reports and output files
+test-output/
+test-output/*
