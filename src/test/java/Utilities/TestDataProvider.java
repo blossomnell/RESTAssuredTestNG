@@ -16,7 +16,7 @@ public class TestDataProvider {
     static String CHAINING_JSON = ConfigReader.getChainingJsonPath();
     static String NON_CHAINING_JSON = ConfigReader.getNonChainingJsonPath();
 
-    // ✅ Reads JSON file once and returns all test cases as a list
+    // Reads JSON file once and returns all test cases as a list
     private static List<JSONObject> readJsonArray(String filePath) {
         JSONParser parser = new JSONParser();
         List<JSONObject> testDataList = new ArrayList<>();
@@ -28,12 +28,12 @@ public class TestDataProvider {
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
-            throw new RuntimeException("❌ Error reading JSON file: " + filePath);
+            throw new RuntimeException("Error reading JSON file: " + filePath);
         }
         return testDataList;
     }
 
-    // ✅ Fetch specific test data by test_case name
+    // Fetch specific test data by test_case name
     private static Object[][] getTestData(String filePath, String testCase) {
         List<JSONObject> jsonData = readJsonArray(filePath);
         for (JSONObject jsonObject : jsonData) {
@@ -41,10 +41,10 @@ public class TestDataProvider {
                 return new Object[][] {{ jsonObject }};
             }
         }
-        return new Object[0][0]; // ✅ Return empty object if no match found
+        return new Object[0][0]; // Return empty object if no match found
     }
 
-    // ✅ Data Provider for API Chaining Tests
+    // Data Provider for API Chaining Tests
     @DataProvider(name = "ChainingData")
     public Object[][] getChainingData() {
         return new Object[][] {
@@ -55,7 +55,7 @@ public class TestDataProvider {
         };
     }
 
-    // ✅ Data Provider for Non-Chaining Tests
+    // Data Provider for Non-Chaining Tests
     @DataProvider(name = "NonChainingData")
     public Object[][] getNonChainingData() {
         return new Object[][] {
