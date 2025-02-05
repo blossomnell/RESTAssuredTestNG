@@ -2,7 +2,6 @@ package pageObjects;
 
 import io.restassured.response.Response;
 import static io.restassured.RestAssured.given;
-import baseTest.BaseTest; // ✅ Import BaseTest to get crumbToken
 
 public class APIChainingPage {
 
@@ -13,12 +12,9 @@ public class APIChainingPage {
 
     // ✅ Step 1: Create User
     public Response createUser(Object payload) {
-        if (payload == null) {
-            throw new IllegalArgumentException("❌ Create User Payload cannot be null!");
-        }
-
+        System.out.println("📌 Sending Create User Request: " + payload.toString());
+        
         Response response = given()
-                .header("Crumb", getCrumbToken()) // ✅ Fetch crumb dynamically
                 .contentType("application/json")
                 .body(payload)
                 .when()
@@ -27,7 +23,12 @@ public class APIChainingPage {
                 .extract()
                 .response();
 
-        System.out.println("✅ User Created: " + response.asString());
+        if (response == null || response.getStatusCode() != 201) {
+            System.out.println("❌ Failed to create user! Response: " + response);
+        } else {
+            System.out.println("✅ User Created Successfully: " + response.asString());
+        }
+
         return response;
     }
 
@@ -37,8 +38,9 @@ public class APIChainingPage {
             throw new IllegalArgumentException("❌ First Name cannot be null or empty!");
         }
 
+        System.out.println("📌 Fetching User with First Name: " + firstName);
+        
         Response response = given()
-                .header("Crumb", getCrumbToken())
                 .pathParam("firstName", firstName)
                 .when()
                 .get(GET_USER_ENDPOINT)
@@ -46,11 +48,16 @@ public class APIChainingPage {
                 .extract()
                 .response();
 
-        System.out.println("✅ User Retrieved: " + response.asString());
+        if (response == null || response.getStatusCode() != 200) {
+            System.out.println("❌ Failed to retrieve user! Response: " + response);
+        } else {
+            System.out.println("✅ User Retrieved Successfully: " + response.asString());
+        }
+
         return response;
     }
 
-    // ✅ Step 3: Update User by User ID
+    // ✅ Step 3: Update User by User ID (Last Name & ZipCode Only)
     public Response updateUser(String userId, Object payload) {
         if (userId == null || userId.isEmpty()) {
             throw new IllegalArgumentException("❌ User ID cannot be null or empty!");
@@ -59,8 +66,9 @@ public class APIChainingPage {
             throw new IllegalArgumentException("❌ Update Payload cannot be null!");
         }
 
+        System.out.println("📌 Updating User with ID: " + userId + " | Payload: " + payload.toString());
+        
         Response response = given()
-                .header("Crumb", getCrumbToken())
                 .contentType("application/json")
                 .pathParam("userId", userId)
                 .body(payload)
@@ -70,7 +78,12 @@ public class APIChainingPage {
                 .extract()
                 .response();
 
-        System.out.println("✅ User Updated: " + response.asString());
+        if (response == null || response.getStatusCode() != 200) {
+            System.out.println("❌ Failed to update user! Response: " + response);
+        } else {
+            System.out.println("✅ User Updated Successfully: " + response.asString());
+        }
+
         return response;
     }
 
@@ -80,8 +93,9 @@ public class APIChainingPage {
             throw new IllegalArgumentException("❌ First Name cannot be null or empty!");
         }
 
+        System.out.println("📌 Deleting User with First Name: " + firstName);
+        
         Response response = given()
-                .header("Crumb", getCrumbToken())
                 .pathParam("firstName", firstName)
                 .when()
                 .delete(DELETE_USER_ENDPOINT)
@@ -89,15 +103,12 @@ public class APIChainingPage {
                 .extract()
                 .response();
 
-        System.out.println("✅ User Deleted: " + response.asString());
-        return response;
-    }
-
-    // ✅ Helper Method: Get Crumb Token
-    private String getCrumbToken() {
-        if (BaseTest.crumbToken == null || BaseTest.crumbToken.isEmpty()) {
-            throw new IllegalStateException("❌ Crumb Token is missing! Ensure it is set in BaseTest.");
+        if (response == null || response.getStatusCode() != 200) {
+            System.out.println("❌ Failed to delete user! Response: " + response);
+        } else {
+            System.out.println("✅ User Deleted Successfully: " + response.asString());
         }
-        return BaseTest.crumbToken;
+
+        return response;
     }
 }
