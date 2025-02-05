@@ -2,7 +2,7 @@ package pageObjects;
 
 import io.restassured.response.Response;
 import static io.restassured.RestAssured.given;
-import baseTest.BaseTest; // ✅ Import BaseTest to use requestSpec
+import baseTest.BaseTest; 
 
 public class APIChainingPage {
 
@@ -11,8 +11,7 @@ public class APIChainingPage {
     private static final String UPDATE_USER_ENDPOINT = "/uap/updateuser/{userId}";  
     private static final String DELETE_USER_ENDPOINT = "/uap/deleteuser/username/{firstName}"; 
 
-
-    // Step 1: Create User (Using requestSpec for Authentication)
+ 
     public Response createUser(Object payload) {
         Response response = given()
                 .spec(BaseTest.requestSpec) 
@@ -43,7 +42,7 @@ public class APIChainingPage {
     }
 
 
-    // ✅ Step 3: Update User by User ID
+    
     public Response updateUser(String userId, Object payload) {
         Response response = given()
                 .spec(BaseTest.requestSpec) 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class JsonDataReader {
 
-    // ✅ Fetches a single user's test data for API chaining
+    //Fetches a single user's test data for API chaining
     public static Map<String, Object> getChainingTestData() {
         String filePath = System.getProperty("user.dir") + "/src/test/resources/Json/ChainingTestData.json";
 
@@ -16,7 +16,7 @@ public class JsonDataReader {
             JSONParser parser = new JSONParser();
             JSONObject jsonObject = (JSONObject) parser.parse(reader);
 
-            // ✅ Convert JSON Object to HashMap
+            // Convert JSON Object to HashMap
             Map<String, Object> testData = new HashMap<>();
             for (Object key : jsonObject.keySet()) {
                 testData.put(key.toString(), jsonObject.get(key));
@@ -29,13 +29,13 @@ public class JsonDataReader {
         }
     }
 
-    // ✅ Fetches update data for PUT request (Dynamically modifies Last Name & Zip Code)
+    // Fetches update data for PUT request (Dynamically modifies Last Name & Zip Code)
     public static Map<String, Object> getUpdateTestData() {
         Map<String, Object> userData = getChainingTestData();  
 
         Map<String, Object> updateData = new HashMap<>();
 
-        // ✅ Dynamically update last name
+        // Dynamically update last name
         if (userData.containsKey("user_last_name")) {
             String existingLastName = userData.get("user_last_name").toString();
             updateData.put("user_last_name", existingLastName + "Updated"); 
