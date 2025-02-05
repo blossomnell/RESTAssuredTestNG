@@ -30,11 +30,11 @@ public class APIChainingTest {
         Response response = apiChainingPage.createUser(userData);
         long endTime = System.currentTimeMillis();
 
-        // ✅ Validate API response
+        // Validate API response
         Assert.assertNotNull(response, "API Response is null!");
         Assert.assertEquals(response.getStatusCode(), 201, "User creation failed! Status: " + response.getStatusCode());
 
-        // ✅ Extract user_id and firstName
+        // Extract user_id and firstName
         userId = response.jsonPath().getString("user_id");
         firstName = response.jsonPath().getString("user_first_name");
 
@@ -89,10 +89,10 @@ public class APIChainingTest {
 
             if (userAddress.containsKey("zipCode")) {
                 String existingZipCode = userAddress.get("zipCode").toString();
-                expectedZipCode = existingZipCode + "1"; // Append '1' for uniqueness
+                expectedZipCode = existingZipCode + "1"; 
                 userAddress.put("zipCode", expectedZipCode);
             } else {
-                throw new RuntimeException("❌ zipCode key is missing in userAddress!");
+                throw new RuntimeException("zipCode key is missing in userAddress!");
             }
 
             updateData.put("userAddress", userAddress); 
