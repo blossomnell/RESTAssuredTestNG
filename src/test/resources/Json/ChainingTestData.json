@@ -1,14 +1,13 @@
 {
-    "user_first_name": "amoomma",
-    "user_last_name": "appoopan",
-    "user_contact_number": "7558888134",
-    "user_email_id": "amoomma.appoo@example.com",
+    "user_first_name": "incee",
+    "user_last_name": "coral",
+    "user_contact_number": "2336101999",
+    "user_email_id": "incee.coral@yahoo.com",
     "userAddress": {
-        "plotNumber": "Z1-892",
-        "street": "Main Avenue",
-        "state": "TX",
+        "plotNumber": "A1-789",
+        "street": "Sunset Blvd",
+        "state": "CA",
         "country": "USA",
-        "zipCode": "78447"
+        "zipCode": "90001"
     }
-    
 }
