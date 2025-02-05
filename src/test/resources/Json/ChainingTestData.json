@@ -1,0 +1,14 @@
+{
+    "user_first_name": "amoomma",
+    "user_last_name": "appoopan",
+    "user_contact_number": "7558888134",
+    "user_email_id": "amoomma.appoo@example.com",
+    "userAddress": {
+        "plotNumber": "Z1-892",
+        "street": "Main Avenue",
+        "state": "TX",
+        "country": "USA",
+        "zipCode": "78447"
+    }
+    
+}
