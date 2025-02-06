@@ -12,7 +12,7 @@ public class BaseTest {
     static {
         try {
             if (!ConfigReader.isConfigLoaded()) {
-                throw new RuntimeException("❌ Config file not loaded properly! Exiting tests.");
+                throw new RuntimeException("Config file not loaded properly! Exiting tests.");
             }
 
             RestAssured.baseURI = ConfigReader.getBaseUrl();
@@ -20,10 +20,10 @@ public class BaseTest {
             requestSpec = RestAssured.given()
                     .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword());
 
-            System.out.println("✅ RestAssured Request Specification Initialized Successfully");
+            System.out.println("RestAssured Request Specification Initialized Successfully");
 
         } catch (Exception e) {
-            throw new RuntimeException("❌ Failed to initialize RequestSpecification: " + e.getMessage());
+            throw new RuntimeException("Failed to initialize RequestSpecification: " + e.getMessage());
         }
     }
 }
