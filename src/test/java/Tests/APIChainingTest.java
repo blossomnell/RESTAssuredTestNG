@@ -1,5 +1,6 @@
 package Tests;
 
+import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -7,6 +8,7 @@ import org.testng.annotations.Test;
 import pageObjects.APIChainingPage;
 import Utilities.JsonDataReader;
 import Utilities.LoggerLoad;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,14 +33,23 @@ public class APIChainingTest {
         Response response = apiChainingPage.createUser(userData);
         long endTime = System.currentTimeMillis();
 
-        Assert.assertNotNull(response, "API Response is null!");
+        // Validate Status Code
         Assert.assertEquals(response.getStatusCode(), 201, "User creation failed! Status: " + response.getStatusCode());
 
+        // Validate Status Line
+        Assert.assertTrue(response.getStatusLine().contains("201"), "Status Line Mismatch! Found: " + response.getStatusLine());
+
+        // Validate Headers
+        Assert.assertNotNull(response.getHeader("Content-Type"), "Missing Content-Type header!");
+
+        // Validate Response Body
         userId = response.jsonPath().getString("user_id");
         firstName = response.jsonPath().getString("user_first_name");
-
         Assert.assertNotNull(userId, "user_id is null!");
         Assert.assertNotNull(firstName, "firstName is null!");
+
+        // Validate Schema
+        response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/CreateUserSchema.json"));
 
         LoggerLoad.info("User Created Successfully - ID: " + userId + ", Name: " + firstName);
         LoggerLoad.info("Response Time: " + (endTime - startTime) + " ms");
@@ -54,7 +65,11 @@ public class APIChainingTest {
         Response response = apiChainingPage.getUser(firstName);
         long endTime = System.currentTimeMillis();
 
+        // Validate Status Code
         Assert.assertEquals(response.getStatusCode(), 200, "User retrieval failed! Status: " + response.getStatusCode());
+
+        // Validate Schema
+        response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/GetUserSchema.json"));
 
         LoggerLoad.info("User Retrieved: ID=" + response.jsonPath().getString("user_id") + ", Name=" + response.jsonPath().getString("user_first_name"));
         LoggerLoad.info("Response Time: " + (endTime - startTime) + " ms");
@@ -97,22 +112,19 @@ public class APIChainingTest {
             throw new RuntimeException("userAddress is missing or not in the correct format!");
         }
 
-        LoggerLoad.info("Final PUT Request Data: " + updateData);
-
         LoggerLoad.info("Updating User ID: " + userId + " with Data: " + updateData);
         long startTime = System.currentTimeMillis();
         Response response = apiChainingPage.updateUser(userId, updateData);
         long endTime = System.currentTimeMillis();
 
+        // Validate Status Code
         Assert.assertEquals(response.getStatusCode(), 200, "User update failed! Status: " + response.getStatusCode());
+
+        // Validate Schema
+        response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/UpdateUserSchema.json"));
 
         String responseLastName = response.jsonPath().getString("user_last_name");
         String responseZipCode = response.jsonPath().getString("userAddress.zipCode");
-
-        if (responseZipCode == null) {
-            LoggerLoad.error("Zip Code not found in API response! Full Response: " + response.asString());
-            throw new RuntimeException("Zip Code not found in API response!");
-        }
 
         Assert.assertEquals(responseLastName, updatedLastName, "Last Name update mismatch!");
         Assert.assertEquals(responseZipCode, expectedZipCode, "Zip Code update mismatch!");
@@ -131,7 +143,11 @@ public class APIChainingTest {
         Response response = apiChainingPage.deleteUser(firstName);
         long endTime = System.currentTimeMillis();
 
+        // Validate Status Code
         Assert.assertEquals(response.getStatusCode(), 200, "User deletion failed! Status: " + response.getStatusCode());
+
+        // Validate Schema
+        response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/DeleteUserSchema.json"));
 
         LoggerLoad.info("User Deleted Successfully!");
         LoggerLoad.info("Response Time: " + (endTime - startTime) + " ms");

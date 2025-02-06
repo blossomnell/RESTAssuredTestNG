@@ -13,7 +13,6 @@ import org.testng.annotations.DataProvider;
 
 public class TestDataProvider {
 
-    static String CHAINING_JSON = ConfigReader.getChainingJsonPath();
     static String NON_CHAINING_JSON = ConfigReader.getNonChainingJsonPath();
 
     // Reads JSON file once and returns all test cases as a list
@@ -41,21 +40,11 @@ public class TestDataProvider {
                 return new Object[][] {{ jsonObject }};
             }
         }
+        System.err.println("Warning: Test case '" + testCase + "' not found in JSON.");
         return new Object[0][0]; // Return empty object if no match found
     }
 
-    // Data Provider for API Chaining Tests
-    @DataProvider(name = "ChainingData")
-    public Object[][] getChainingData() {
-        return new Object[][] {
-            getTestData(CHAINING_JSON, "POST - Create User"),
-            getTestData(CHAINING_JSON, "GET - Retrieve User"),
-            getTestData(CHAINING_JSON, "PUT - Update User"),
-            getTestData(CHAINING_JSON, "DELETE - Remove User")
-        };
-    }
-
-    // Data Provider for Non-Chaining Tests
+    // Data Provider for Non-Chaining Tests (Independent Tests)
     @DataProvider(name = "NonChainingData")
     public Object[][] getNonChainingData() {
         return new Object[][] {
