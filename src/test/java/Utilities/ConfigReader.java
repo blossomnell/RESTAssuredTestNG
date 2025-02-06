@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigReader {
-    static Properties prop = new Properties();
+    private static final Properties prop = new Properties();
 
     // Static block to initialize properties
     static {
@@ -20,53 +20,47 @@ public class ConfigReader {
                 throw new RuntimeException("Config file not found at: " + configPath);
             }
 
-            FileInputStream fis = new FileInputStream(file);
-            prop.load(fis);
-            fis.close();
-            System.out.println("Configuration file loaded successfully from: " + configPath);
+            // Auto-closing file stream
+            try (FileInputStream fis = new FileInputStream(file)) {
+                prop.load(fis);
+            }
+
+            LoggerLoad.info("Configuration file loaded successfully from: " + configPath);
+
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Could not load config.properties file.");
+            LoggerLoad.error("Could not load config.properties file: " + e.getMessage());
+            throw new RuntimeException("Could not load config.properties file.", e);
         }
     }
 
-    // Fetch individual properties (Fix for BaseTest)
-    public static String getBaseUrl() {
-        return getProperty("baseurl");
-    }
+    // Fetch individual properties (Pre-fetched values to avoid redundant calls)
+    private static final String BASE_URL = getProperty("baseurl");
+    private static final String USERNAME = getProperty("username");
+    private static final String PASSWORD = getProperty("password");
+    private static final String CHAINING_JSON_PATH = getProperty("chainingJsonPath");
+    private static final String NON_CHAINING_JSON_PATH = getProperty("nonChainingJsonPath");
 
-    public static String getUsername() {
-        return getProperty("username");
-    }
-
-    public static String getPassword() {
-        return getProperty("password");
-    }
-
-    public static String getChainingJsonPath() {
-        return getProperty("chainingJsonPath");
-    }
-
-    public static String getNonChainingJsonPath() {
-        return getProperty("nonChainingJsonPath");
-    }
+    public static String getBaseUrl() { return BASE_URL; }
+    public static String getUsername() { return USERNAME; }
+    public static String getPassword() { return PASSWORD; }
+    public static String getChainingJsonPath() { return CHAINING_JSON_PATH; }
+    public static String getNonChainingJsonPath() { return NON_CHAINING_JSON_PATH; }
 
     // Generic method to fetch properties
-    public static String getProperty(String key) {
+    private static String getProperty(String key) {
         String value = prop.getProperty(key);
         if (value == null || value.isEmpty()) {
-            System.out.println("Warning: Missing value for key: " + key);
+            LoggerLoad.warn("Warning: Missing value for key: " + key);
         }
         return value;
     }
 
     // Print Configuration Details for Debugging
     public static void printConfigDetails() {
-        System.out.println("Base URL: " + getBaseUrl());
-        System.out.println("Browser: " + getProperty("browser"));
-        System.out.println("Username: " + getUsername());
-        System.out.println("Chaining JSON Path: " + getChainingJsonPath());
-        System.out.println("Non-Chaining JSON Path: " + getNonChainingJsonPath());
+        LoggerLoad.info("Base URL: " + BASE_URL);
+        LoggerLoad.info("Username: " + USERNAME);
+        LoggerLoad.info("Chaining JSON Path: " + CHAINING_JSON_PATH);
+        LoggerLoad.info("Non-Chaining JSON Path: " + NON_CHAINING_JSON_PATH);
     }
 
     // Validate If Config File Loaded Properly

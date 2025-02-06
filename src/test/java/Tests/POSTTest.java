@@ -1,52 +1,74 @@
 package Tests;
 
+import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
-import org.json.simple.JSONObject;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 import pageObjects.POSTPage;
+import Utilities.LoggerLoad;
 import Utilities.TestDataProvider;
-import baseTest.BaseTest;
+import org.json.simple.JSONObject;
 
-import java.util.Random; // ✅ Import for generating random contact number
+import java.io.File;
 
-public class POSTTest extends BaseTest {
-    private POSTPage postPage;
+public class POSTTest {
 
-    @BeforeClass
-    public void setupPage() {
-        postPage = new POSTPage();
-    }
+    POSTPage postPage = new POSTPage();
+    private static final String CREATE_USER_SCHEMA_PATH = "src/test/resources/schemas/CreateUserSchema.json";
 
-    @Test(dataProvider = "NonChainingData", dataProviderClass = TestDataProvider.class)
-    public void testCreateUser(String testCase, Object payload) {
-        // ✅ Ensure payload is mutable
-        JSONObject payloadObject = new JSONObject((java.util.Map) payload);
+    @Test(dataProvider = "PostData", dataProviderClass = TestDataProvider.class)
+    public void testCreateUser(JSONObject testData) {
+        // Debugging: Print received test data
+        System.out.println("Using Test Data: " + testData.toJSONString());
 
-        // 🔹 Generate a unique contact number dynamically
-        String contactNumber = "123" + (1000000 + new Random().nextInt(9000000));
-        payloadObject.put("user_contact_number", contactNumber);
+        String testCaseName = (String) testData.get("test_case");
 
-        // 🔹 Generate a unique email dynamically
-        String uniqueEmail = "user" + System.currentTimeMillis() + "@example.com";
-        payloadObject.put("user_email_id", uniqueEmail);
-
-        System.out.println("✔ Creating User with Payload: " + payloadObject.toJSONString());
-
-        // ✅ Send POST request
-        Response response = postPage.createUser(payloadObject);
-
-        System.out.println("✔ Response Status Code: " + response.getStatusCode());
-        System.out.println("✔ Response Body: " + response.asString());
-
-        // ✅ Assertions
-        if (testCase.contains("Positive")) {
-            Assert.assertEquals(response.getStatusCode(), 201, "✅ User should be created successfully!");
-            System.out.println("✅ User Created Successfully!");
-        } else if (testCase.contains("Negative")) {
-            Assert.assertNotEquals(response.getStatusCode(), 201, "❌ User creation should fail!");
-            System.out.println("❌ Expected Failure - User creation unsuccessful.");
+        // Ensure only POST-related tests run
+        if (!testCaseName.startsWith("Create User")) {
+            throw new SkipException("Skipping non-POST test: " + testCaseName);
         }
+
+        LoggerLoad.info("Running Test Case: " + testCaseName);
+
+        // Send POST request
+        Response response = postPage.createUser(testData);
+        int statusCode = response.getStatusCode();
+        String statusLine = response.getStatusLine();
+        String responseBody = response.getBody().asString();
+
+        // Logging response details
+        LoggerLoad.info("Response Status Code: " + statusCode);
+        LoggerLoad.info("Response Status Line: " + statusLine);
+        LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
+        LoggerLoad.info("Response Body: " + responseBody);
+
+        if (testCaseName.contains("Positive")) {
+            LoggerLoad.info("Expected Success for Test: " + testCaseName);
+            Assert.assertEquals(statusCode, 201, "Expected 201 Created, but got: " + statusCode);
+            
+            // Simplified Status Line Validation
+            Assert.assertTrue(statusLine.contains("201"), "Status Line Mismatch! Found: " + statusLine);
+            
+            // Header Validations
+            Assert.assertEquals(response.getHeader("Content-Type"), "application/json",
+                    "Unexpected Content-Type in response");
+            Assert.assertNotNull(response.getHeader("Server"), "Server header is missing");
+
+            // Response Body Validations
+            Assert.assertNotNull(response.jsonPath().getString("user_id"), "user_id is null!");
+            Assert.assertNotNull(response.jsonPath().getString("user_first_name"), "firstName is null!");
+
+            // JSON Schema Validation
+            response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(CREATE_USER_SCHEMA_PATH)));
+
+        } else if (testCaseName.contains("Negative")) {
+            LoggerLoad.info("Expected Failure for Test: " + testCaseName);
+            Assert.assertNotEquals(statusCode, 201, "Expected failure but received 201 Created!");
+            Assert.assertTrue(responseBody.contains("user FirstName is mandatory"),
+                    "Expected error message for invalid first name, but got: " + responseBody);
+        }
+
+        LoggerLoad.info("Test Completed: " + testCaseName);
     }
 }
