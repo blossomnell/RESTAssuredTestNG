@@ -9,22 +9,14 @@ import java.util.Map;
 public class POSTPage {
     private static final String CREATE_USER_ENDPOINT = "/uap/createusers";
 
-    @SuppressWarnings("unchecked")
-    public Response createUser(Object payload) {
-        // Ensure the payload is a valid Map before converting to JSONObject
-        JSONObject requestBody = new JSONObject();
-
-        if (payload instanceof Map<?, ?>) {
-            Map<String, Object> safePayload = (Map<String, Object>) payload;
-            requestBody.putAll(safePayload); // Safe conversion
-        } else {
-            throw new IllegalArgumentException("Invalid payload: Expected a Map<String, Object>");
-        }
+    public Response createUser(Map<String, Object> payload) {
+        // Convert Map to JSONObject directly
+        JSONObject requestBody = new JSONObject(payload);
 
         // Logging request details
-        LoggerLoad.info("🔹 Creating User with Payload: " + requestBody.toJSONString());
+        LoggerLoad.info("Creating User with Payload: " + requestBody.toJSONString());
 
-        // Sending POST request using BaseTest.requestSpec
+        // Sending POST request
         Response response = BaseTest.requestSpec
                 .contentType("application/json")
                 .body(requestBody)
@@ -35,15 +27,38 @@ public class POSTPage {
                 .response();
 
         // Logging response details
-        LoggerLoad.info("📌 Response Status Code: " + response.getStatusCode());
-        LoggerLoad.info("📌 Response Body: " + response.asString());
+        LoggerLoad.info("Response Status Code: " + response.getStatusCode());
+        LoggerLoad.info("Response Body: " + response.asString());
 
-        // Handling Negative Scenario
+        return response;
+    }
+
+    
+    public Response createUserWithInvalidData(Map<String, Object> invalidPayload) {
+        // Convert Map to JSONObject directly
+        JSONObject requestBody = new JSONObject(invalidPayload);
+
+        // Logging request details
+        LoggerLoad.info("Attempting Invalid User Creation with Payload: " + requestBody.toJSONString());
+
+        // Sending POST request
+        Response response = BaseTest.requestSpec
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post(CREATE_USER_ENDPOINT)
+                .then()
+                .extract()
+                .response();
+
+        // Logging response details
+        LoggerLoad.info("Response Status Code: " + response.getStatusCode());
+        LoggerLoad.info("Response Body: " + response.asString());
+
+        // Handling Negative Scenario Logging
         if (response.getStatusCode() != 201) {
-            LoggerLoad.error("❌ User creation failed. Status Code: " + response.getStatusCode());
-            if (response.getStatusCode() == 400) {
-                LoggerLoad.error("🚨 Expected Negative Scenario: Invalid input data.");
-            }
+            LoggerLoad.error("User creation failed. Status Code: " + response.getStatusCode());
+            LoggerLoad.error("Expected Negative Scenario: Invalid input data.");
         }
 
         return response;

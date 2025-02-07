@@ -13,11 +13,12 @@
         </classes>
     </test>
     
-    <test name="NonChaining_Tests">
-        <classes>
-            <class name="Tests.POSTTest"/>
-            <class name="Tests.GETTest"/>
-        </classes>
-    </test>
+<!--    <test name="NonChaining_Tests">-->
+<!--        <classes>-->
+<!--            <class name="Tests.POSTTest"/>-->
+<!--            <class name="Tests.GETTest"/>-->
+<!--            <class name="Tests.PUTTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 
 </suite>

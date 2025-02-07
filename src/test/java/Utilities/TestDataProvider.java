@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,49 +14,63 @@ import org.testng.annotations.DataProvider;
 
 public class TestDataProvider {
 
-    static String NON_CHAINING_JSON = ConfigReader.getNonChainingJsonPath();
+    private static final String NON_CHAINING_JSON = ConfigReader.getNonChainingJsonPath();
+    private static List<JSONObject> testDataList = new ArrayList<>(); // Store test data in memory
 
-    // Reads JSON file once and returns all test cases as a list
-    private static List<JSONObject> readJsonArray(String filePath) {
-        JSONParser parser = new JSONParser();
-        List<JSONObject> testDataList = new ArrayList<>();
+    // Reads JSON once and stores data in a list
+    static {
+        if (NON_CHAINING_JSON == null || NON_CHAINING_JSON.isEmpty()) {
+            throw new RuntimeException("Error: JSON file path is null or empty in ConfigReader.");
+        }
 
-        try (FileReader reader = new FileReader(filePath)) {
+        try (FileReader reader = new FileReader(NON_CHAINING_JSON)) {
+            JSONParser parser = new JSONParser();
             JSONArray jsonArray = (JSONArray) parser.parse(reader);
             for (Object obj : jsonArray) {
                 testDataList.add((JSONObject) obj);
             }
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error reading JSON file: " + filePath);
-        }
-        return testDataList;
-    }
 
-    // Fetch specific test data by test_case name
-    private static Object[][] getTestData(String filePath, String testCase) {
-        List<JSONObject> jsonData = readJsonArray(filePath);
-        for (JSONObject jsonObject : jsonData) {
-            if (jsonObject.containsKey("test_case") && jsonObject.get("test_case").equals(testCase)) {
-                return new Object[][] {{ jsonObject }};
+           
+            System.out.println("Loaded Test Cases from JSON:");
+            for (JSONObject jsonObject : testDataList) {
+                System.out.println("   ➤ " + jsonObject.get("test_case"));
             }
+
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException("Error reading JSON file: " + NON_CHAINING_JSON, e);
         }
-        System.err.println("Warning: Test case '" + testCase + "' not found in JSON.");
-        return new Object[0][0]; // Return empty object if no match found
     }
 
-    // Data Provider for Non-Chaining Tests (Independent Tests)
-    @DataProvider(name = "NonChainingData")
-    public Object[][] getNonChainingData() {
-        return new Object[][] {
-            getTestData(NON_CHAINING_JSON, "Create User - Positive"),
-            getTestData(NON_CHAINING_JSON, "Create User - Negative (Special Characters in First Name)"),
-            getTestData(NON_CHAINING_JSON, "Get User - Positive"),
-            getTestData(NON_CHAINING_JSON, "Get User - Negative (Wrong Endpoint)"),
-            getTestData(NON_CHAINING_JSON, "Update User - Positive"),
-            getTestData(NON_CHAINING_JSON, "Update User - Negative (Special Characters in First Name)"),
-            getTestData(NON_CHAINING_JSON, "Delete User - Positive"),
-            getTestData(NON_CHAINING_JSON, "Delete User - Negative (Invalid User ID)")
-        };
+   
+    private static Object[][] filterTestCases(String prefix) {
+        List<JSONObject> filteredCases = testDataList.stream()
+            .filter(data -> ((String) data.get("test_case")).startsWith(prefix))
+            .collect(Collectors.toList()); // Java 8+ compatibility
+
+        return filteredCases.stream().map(data -> new Object[]{data}).toArray(Object[][]::new);
+    }
+
+    
+    @DataProvider(name = "PostData")
+    public Object[][] getPostData() {
+        return filterTestCases("Create User");
+    }
+
+    
+    @DataProvider(name = "GetData")
+    public Object[][] getGetData() {
+        return filterTestCases("Get User");
+    }
+
+    
+    @DataProvider(name = "PutData")
+    public Object[][] getPutData() {
+        return filterTestCases("Update User");
+    }
+
+   
+    @DataProvider(name = "DeleteData")
+    public Object[][] getDeleteData() {
+        return filterTestCases("Delete User");
     }
 }

@@ -1,79 +1,91 @@
 package Tests;
 
+import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
-import org.json.simple.JSONObject;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
 import pageObjects.PUTPage;
-import pageObjects.POSTPage; // ✅ Added import for POSTPage
+import Utilities.LoggerLoad;
 import Utilities.TestDataProvider;
-import baseTest.BaseTest;
+import org.json.simple.JSONObject;
+import java.io.File;
 
-import java.util.Random; // ✅ Import for generating unique contact number
+public class PUTTest {
 
-public class PUTTest extends BaseTest {
-    private PUTPage putPage;
-    private POSTPage postPage; // ✅ Added POSTPage instance
-    private String userId;
+    PUTPage putPage = new PUTPage();
+    private static final String UPDATE_USER_SCHEMA_PATH = "src/test/resources/schemas/UpdateUserSchema.json";
 
-    @BeforeClass
-    public void setupPage() {
-        putPage = new PUTPage();
-        postPage = new POSTPage(); // ✅ Initialize postPage
+    @Test(dataProvider = "PutData", dataProviderClass = TestDataProvider.class)
+    public void testUpdateUser(JSONObject testData) {
+        String testCaseName = (String) testData.get("test_case");
 
-        // Retrieve user ID dynamically or create a new user if missing
-        userId = System.getProperty("user_id");
+        // Ensure only PUT-related tests run
+        if (!testCaseName.startsWith("Update User")) {
+            throw new SkipException("Skipping non-PUT test: " + testCaseName);
+        }
 
-        if (userId == null || userId.isEmpty()) {
-            System.out.println("⚠ No User ID found. Creating a new user...");
+        LoggerLoad.info("Running Test Case: " + testCaseName);
 
-            // ✅ Create a new user and fetch user ID from response
-            JSONObject newUserPayload = new JSONObject();
-            newUserPayload.put("user_first_name", "AutoUser");
-            newUserPayload.put("user_last_name", "Test");
+        // Extract user ID
+        String userId = (String) testData.get("user_id");
+        if (userId == null) {
+            throw new IllegalArgumentException("user_id is missing in test data!");
+        }
 
-            // 🔹 Generate a unique contact number dynamically
-            String contactNumber = "123" + (1000000 + new Random().nextInt(9000000));
-            newUserPayload.put("user_contact_number", contactNumber);
-
-            newUserPayload.put("user_email_id", "autouser" + System.currentTimeMillis() + "@example.com");
-
-            Response createResponse = postPage.createUser(newUserPayload); // ✅ Calling POSTPage correctly
-            userId = createResponse.jsonPath().getString("user_id"); // Fetch user_id dynamically
-
-            if (userId == null || userId.isEmpty()) {
-                throw new IllegalStateException("❌ Failed to create user. User ID is null!");
-            }
-
-            System.out.println("✅ New User Created. ID: " + userId);
-            System.setProperty("user_id", userId); // Store for future use
+        Response response;
+        if (testCaseName.contains("Positive")) {
+            response = putPage.updateUser(userId, testData);
         } else {
-            System.out.println("✔ Retrieved User ID for PUT: " + userId);
+            response = putPage.updateUserWithInvalidData(userId, testData);
         }
-    }
 
-    @Test(dataProvider = "NonChainingData", dataProviderClass = TestDataProvider.class)
-    public void testUpdateUser(String testCase, Object payload) {
-        // ✅ Ensure payload is mutable
-        JSONObject payloadObject = new JSONObject((java.util.Map) payload);
+        int statusCode = response.getStatusCode();
+        String statusLine = response.getStatusLine().trim(); // Trim to handle extra spaces
+        String responseBody = response.getBody().asString();
 
-        // ✅ Inject user ID into payload
-        payloadObject.put("user_id", userId);
+        // Log response details
+        LoggerLoad.info("Response Status Code: " + statusCode);
+        LoggerLoad.info("Response Status Line: " + statusLine);
+        LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
+        LoggerLoad.info("Response Body: " + responseBody);
 
-        System.out.println("✔ Updating user with ID: " + userId);
-        System.out.println("✔ Payload Sent: " + payloadObject.toJSONString());
+        if (testCaseName.contains("Positive")) {
+            LoggerLoad.info("Expected Success for Test: " + testCaseName);
 
-        // ✅ Send PUT request
-        Response response = putPage.updateUser(userId, payloadObject);
+            // **Status Code Validation**
+            Assert.assertEquals(statusCode, 200, "Expected 200 OK, but got: " + statusCode);
 
-        // ✅ Assertions
-        if (testCase.contains("Positive")) {
-            Assert.assertEquals(response.getStatusCode(), 200, "✅ User should be updated successfully!");
-            System.out.println("✅ User successfully updated: " + response.asString());
-        } else if (testCase.contains("Negative")) {
-            Assert.assertNotEquals(response.getStatusCode(), 200, "❌ User update should fail!");
-            System.out.println("❌ Expected failure - Update unsuccessful: " + response.asString());
+            // **Status Line Validation (Removes "HTTP/1.1" and checks only status code)**
+            Assert.assertTrue(statusLine.contains("200"), "Unexpected Status Line: " + statusLine);
+
+            // **Header Validations**
+            Assert.assertEquals(response.getHeader("Content-Type"), "application/json", "Invalid Content-Type");
+            Assert.assertNotNull(response.getHeader("Server"), "Server header is missing");
+
+            // **Data Validation**
+            Assert.assertEquals(response.jsonPath().getString("user_first_name"), testData.get("user_first_name"), "First name mismatch!");
+            Assert.assertEquals(response.jsonPath().getString("user_last_name"), testData.get("user_last_name"), "Last name mismatch!");
+            Assert.assertEquals(response.jsonPath().getString("user_email_id"), testData.get("user_email_id"), "Email mismatch!");
+
+            // **JSON Schema Validation**
+            response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(UPDATE_USER_SCHEMA_PATH)));
+
+        } else if (testCaseName.contains("Negative")) {
+            LoggerLoad.info("Expected Failure for Test: " + testCaseName);
+
+            // **Status Code Validation**
+            Assert.assertEquals(statusCode, 400, "Expected 400 BAD_REQUEST, but got: " + statusCode);
+
+            // **Status Line Validation (Removes "HTTP/1.1" and checks only status code)**
+            Assert.assertTrue(statusLine.contains("400"), "Unexpected Status Line: " + statusLine);
+
+            // **Error Message Validation (Allows minor variations)**
+            String actualErrorMessage = response.jsonPath().getString("message");
+            Assert.assertTrue(actualErrorMessage.toLowerCase().contains("user first name is mandatory"),
+                    "Error message mismatch! Expected part of: 'User First Name is mandatory...' but found: " + actualErrorMessage);
         }
+
+        LoggerLoad.info("Test Completed: " + testCaseName);
     }
 }

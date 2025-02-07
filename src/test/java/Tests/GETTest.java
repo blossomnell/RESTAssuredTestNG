@@ -9,7 +9,6 @@ import pageObjects.GETPage;
 import Utilities.LoggerLoad;
 import Utilities.TestDataProvider;
 import org.json.simple.JSONObject;
-
 import java.io.File;
 
 public class GETTest {
@@ -33,7 +32,7 @@ public class GETTest {
         String userFirstName = (String) testData.get("user_first_name");
         String wrongEndpoint = (String) testData.get("wrong_endpoint");
 
-        // Send GET request
+        // 🔹 Send GET request
         Response response;
         if (userFirstName != null) {
             response = getPage.getUserByFirstName(userFirstName);
@@ -47,37 +46,47 @@ public class GETTest {
         String statusLine = response.getStatusLine();
         String responseBody = response.getBody().asString();
 
-        // Logging response details
+        // Extract only status code from status line (removes HTTP part)
+        String extractedStatusCode = statusLine.split(" ")[1]; // Extracts the status code from "HTTP/1.1 200"
+
+        // Log response details
         LoggerLoad.info("Response Status Code: " + statusCode);
-        LoggerLoad.info("Response Status Line: " + statusLine);
+        LoggerLoad.info("Extracted Status Code from Status Line: " + extractedStatusCode);
         LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
         LoggerLoad.info("Response Body: " + responseBody);
 
         if (testCaseName.contains("Positive")) {
             LoggerLoad.info("Expected Success for Test: " + testCaseName);
             
-            // Status Code Validation
+            // **Status Code Validation**
             Assert.assertEquals(statusCode, 200, "Expected 200 OK, but got: " + statusCode);
             
-            // Simplified Status Line Validation
-            Assert.assertTrue(statusLine.contains("200"), "Status Line Mismatch! Found: " + statusLine);
-            
-            // Header Validations
+            // **Status Line Validation (Without HTTP Part)**
+            Assert.assertEquals(extractedStatusCode, "200", "Unexpected Status Code in Status Line!");
+
+            // **Header Validations**
             Assert.assertEquals(response.getHeader("Content-Type"), "application/json",
                     "Unexpected Content-Type in response");
             Assert.assertNotNull(response.getHeader("Server"), "Server header is missing");
 
-            // Response Body Validations
+            // **Data Validation**
             Assert.assertNotNull(responseBody, "Response body is empty!");
             Assert.assertTrue(responseBody.contains("\"user_first_name\":\"" + userFirstName + "\""),
                     "Expected user details in response but got: " + responseBody);
 
-            // JSON Schema Validation
+            // **JSON Schema Validation**
             response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(GET_USER_SCHEMA_PATH)));
 
         } else if (testCaseName.contains("Negative")) {
             LoggerLoad.info("Expected Failure for Test: " + testCaseName);
+            
+            // **Status Code Validation**
             Assert.assertNotEquals(statusCode, 200, "Expected failure but received 200 OK!");
+
+            // **Status Line Validation (Without HTTP Part)**
+            Assert.assertNotEquals(extractedStatusCode, "200", "Unexpected Success in Status Line!");
+
+            // **Error Message Validation**
             Assert.assertTrue(statusCode == 404 || responseBody.toLowerCase().contains("not found") 
                     || responseBody.toLowerCase().contains("error"),
                     "Expected failure message in response but got: " + responseBody);
