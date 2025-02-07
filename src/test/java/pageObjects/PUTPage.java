@@ -12,8 +12,8 @@ public class PUTPage {
 
   
     public Response updateUser(String userId, Object updateUserPayload) {
-        LoggerLoad.info("🔹 Sending PUT request to update user with ID: " + userId);
-        LoggerLoad.info("🔹 Request Payload: " + updateUserPayload.toString());
+        LoggerLoad.info("Sending PUT request to update user with ID: " + userId);
+        LoggerLoad.info("Request Payload: " + updateUserPayload.toString());
 
         // Create a fresh request spec to avoid conflicts
         RequestSpecification requestSpec = RestAssured.given()

@@ -7,18 +7,18 @@
         <listener class-name="Utilities.TestListener"/>
     </listeners>
   
-    <test name="API_Chaining_Tests">
-        <classes>
-            <class name="Tests.APIChainingTest"/>
-        </classes>
-    </test>
-    
-<!--    <test name="NonChaining_Tests">-->
+<!--    <test name="API_Chaining_Tests">-->
 <!--        <classes>-->
-<!--            <class name="Tests.POSTTest"/>-->
-<!--            <class name="Tests.GETTest"/>-->
-<!--            <class name="Tests.PUTTest"/>-->
+<!--            <class name="Tests.APIChainingTest"/>-->
 <!--        </classes>-->
 <!--    </test>-->
+    
+    <test name="NonChaining_Tests">
+        <classes>
+            <class name="Tests.POSTTest"/>
+            <class name="Tests.GETTest"/>
+            <class name="Tests.PUTTest"/>
+        </classes>
+    </test>
 
 </suite>

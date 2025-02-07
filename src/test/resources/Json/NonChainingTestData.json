@@ -1,10 +1,10 @@
 [
     {
         "test_case": "Create User - Positive",
-        "user_first_name": "thresi",
-        "user_last_name": "eli",
-        "user_contact_number": "2269993022",
-        "user_email_id": "thresi.eli@example.com",
+        "user_first_name": "resi",
+        "user_last_name": "peli",
+        "user_contact_number": "2219993022",
+        "user_email_id": "resi.peli@example.com",
         "userAddress": {
             "plotNumber": "A-123",
             "street": "Maple Street",
@@ -39,7 +39,7 @@
         "test_case": "Update User - Positive",
         "user_id": "18548",
         "user_first_name": "fasfafs",
-        "user_last_name": "NotdonUpdated",
+        "user_last_name": "Notdon",
         "user_contact_number": "9003114004",
         "user_email_id": "lfhgfdd.den@gmail.com",
         "userAddress": {
@@ -47,7 +47,7 @@
             "street": "scsscsa",
             "state": "csacsc",
             "country": "scsdvsdv",
-            "zipCode": "221155"
+            "zipCode": "227788"
         }
     },
     {

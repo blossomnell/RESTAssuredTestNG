@@ -32,7 +32,7 @@ public class GETTest {
         String userFirstName = (String) testData.get("user_first_name");
         String wrongEndpoint = (String) testData.get("wrong_endpoint");
 
-        // 🔹 Send GET request
+        // Send GET request
         Response response;
         if (userFirstName != null) {
             response = getPage.getUserByFirstName(userFirstName);
