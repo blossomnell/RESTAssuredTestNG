@@ -16,7 +16,7 @@ public class GETTest {
     GETPage getPage = new GETPage();
     private static final String GET_USER_SCHEMA_PATH = "src/test/resources/schemas/GetUserSchema.json";
 
-    @Test(dataProvider = "GetData", dataProviderClass = TestDataProvider.class)
+    @Test(priority=6, dataProvider = "GetData", dataProviderClass = TestDataProvider.class)
     public void testGetUser(JSONObject testData) {
         // Extract test case name
         String testCaseName = (String) testData.get("test_case");

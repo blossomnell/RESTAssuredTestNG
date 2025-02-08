@@ -16,7 +16,7 @@ public class DELETETest {
     DELETEPage deletePage = new DELETEPage();
     private static final String DELETE_USER_SCHEMA_PATH = "src/test/resources/schemas/DeleteUserSchema.json";
 
-    @Test(dataProvider = "DeleteData", dataProviderClass = TestDataProvider.class)
+    @Test(priority=8, dataProvider = "DeleteData", dataProviderClass = TestDataProvider.class)
     public void testDeleteUser(JSONObject testData) {
         String testCaseName = (String) testData.get("test_case");
 

@@ -16,7 +16,7 @@ public class PUTTest {
     PUTPage putPage = new PUTPage();
     private static final String UPDATE_USER_SCHEMA_PATH = "src/test/resources/schemas/UpdateUserSchema.json";
 
-    @Test(dataProvider = "PutData", dataProviderClass = TestDataProvider.class)
+    @Test(priority=7, dataProvider = "PutData", dataProviderClass = TestDataProvider.class)
     public void testUpdateUser(JSONObject testData) {
         String testCaseName = (String) testData.get("test_case");
 
