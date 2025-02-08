@@ -5,6 +5,8 @@
     <listeners>
         <listener class-name="org.testng.reporters.XMLReporter"/>
         <listener class-name="Utilities.TestListener"/>
+        <!-- Add Allure Listener -->
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
   
     <test name="API_Chaining_Tests">
@@ -13,7 +15,7 @@
         </classes>
     </test>
     
-    <test name="NonChaining_Tests">
+ <test name="NonChaining_Tests">
         <classes>
             <class name="Tests.POSTTest"/>
             <class name="Tests.GETTest"/>
@@ -21,5 +23,6 @@
             <class name="Tests.DELETETest"/>
         </classes>
     </test>
+   
 
 </suite>
