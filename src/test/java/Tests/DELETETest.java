@@ -1,64 +1,137 @@
 package Tests;
 
+import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
-
-import org.json.simple.JSONObject;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
+import org.testng.SkipException;
 import org.testng.annotations.Test;
-
-import Utilities.TestDataProvider;
 import pageObjects.DELETEPage;
-import pageObjects.POSTPage;
-import baseTest.BaseTest;
+import Utilities.LoggerLoad;
+import Utilities.TestDataProvider;
+import org.json.simple.JSONObject;
+import java.io.File;
 
-public class DELETETest extends BaseTest {
-    private DELETEPage deletePage;
-    private POSTPage postPage;
-    private String userId;
+public class DELETETest {
 
-    @BeforeClass
-    public void setupPage() {
-        deletePage = new DELETEPage();
-        postPage = new POSTPage();
+    DELETEPage deletePage = new DELETEPage();
+    private static final String DELETE_USER_SCHEMA_PATH = "src/test/resources/schemas/DeleteUserSchema.json";
 
-        // Retrieve User ID dynamically
-        userId = System.getProperty("user_id");
+    @Test(dataProvider = "DeleteData", dataProviderClass = TestDataProvider.class)
+    public void testDeleteUser(JSONObject testData) {
+        String testCaseName = (String) testData.get("test_case");
 
-        if (userId == null || userId.isEmpty()) {
-            System.out.println("⚠ No User ID found. Creating a new user...");
+        if (!testCaseName.startsWith("Delete User")) {
+            throw new SkipException("Skipping non-DELETE test: " + testCaseName);
+        }
 
-            // Create a new user and fetch user ID from response
-            JSONObject newUserPayload = new JSONObject();
-            newUserPayload.put("user_first_name", "DeleteUser");
-            newUserPayload.put("user_last_name", "Test");
-            newUserPayload.put("user_contact_number", "9998887770");
-            newUserPayload.put("user_email_id", "deleteuser.test@example.com");
+        LoggerLoad.info("Running Test Case: " + testCaseName);
 
-            Response createResponse = postPage.createUser(newUserPayload);
-            userId = createResponse.jsonPath().getString("user_id");  // Fetch user_id dynamically
+        Response response;
+        int expectedStatusCode;
+        String expectedStatusLine;
 
-            System.out.println("✅ New User Created. ID: " + userId);
-            System.setProperty("user_id", userId); // Store for future use
+        if (testCaseName.contains("Positive")) {
+            // DELETE by First Name (Positive Case)
+            String userFirstName = (String) testData.get("user_first_name");
+            if (userFirstName == null || userFirstName.isEmpty()) {
+                throw new IllegalArgumentException("user_first_name is missing in test data!");
+            }
+
+            // Step 1: Perform GET request before DELETE to confirm user exists
+            LoggerLoad.info("Performing GET request before DELETE for user: " + userFirstName);
+            Response getUserResponse = deletePage.getUserByFirstName(userFirstName);
+            int getUserStatusCode = getUserResponse.getStatusCode();
+
+            LoggerLoad.info("GET Response Status Code: " + getUserStatusCode);
+            LoggerLoad.info("GET Response Body: " + getUserResponse.getBody().asString());
+
+            if (getUserStatusCode != 200) {
+                LoggerLoad.error("User not found! Skipping DELETE for: " + userFirstName);
+                Assert.fail("GET request failed. User '" + userFirstName + "' does not exist.");
+            }
+
+            // Step 2: Proceed with DELETE only if GET is successful
+            LoggerLoad.info("🗑Sending DELETE request for user: " + userFirstName);
+            response = deletePage.deleteUserByFirstName(userFirstName);
+            expectedStatusCode = 200;
+            expectedStatusLine = "200 OK";
+
+            // Step 3: Verify user is actually deleted
+            LoggerLoad.info("Performing GET request after DELETE to verify user deletion: " + userFirstName);
+            Response getAfterDelete = deletePage.getUserByFirstName(userFirstName);
+            Assert.assertEquals(getAfterDelete.getStatusCode(), 404, "User still exists after DELETE!");
+            LoggerLoad.info("Verified user is successfully deleted!");
+
         } else {
-            System.out.println("✅ Retrieved User ID for DELETE: " + userId);
+            // DELETE by Invalid User ID (Negative Case)
+            String invalidUserId = (String) testData.get("user_id");
+            if (invalidUserId == null || invalidUserId.isEmpty()) {
+                throw new IllegalArgumentException("user_id is missing in test data!");
+            }
+
+            LoggerLoad.info("Sending DELETE request with INVALID User ID: " + invalidUserId);
+            response = deletePage.deleteUserByInvalidId(invalidUserId);
+
+            // Handle both 400 and 404 responses
+            int statusCode = response.getStatusCode();
+            if (statusCode == 400) {
+                expectedStatusCode = 400;
+                expectedStatusLine = "400 Bad Request";
+                LoggerLoad.info("Expected failure: Bad Request due to invalid User ID format.");
+            } else if (statusCode == 404) {
+                expectedStatusCode = 404;
+                expectedStatusLine = "404 Not Found";
+                LoggerLoad.info("Expected failure: User does not exist.");
+            } else {
+                Assert.fail("Unexpected Status Code! Expected 400 or 404 but got: " + statusCode);
+                return;
+            }
         }
-    }
 
-    @Test(dataProvider = "NonChainingData", dataProviderClass = TestDataProvider.class)
-    public void testDeleteUser(String testCase, Object payload) {
-        System.out.println("🔹 Deleting user with ID: " + userId);
+        int statusCode = response.getStatusCode();
+        String statusLine = response.getStatusLine().trim().replace("HTTP/1.1 ", "");
+        String responseBody = response.getBody().asString();
 
-        // Send DELETE request
-        Response response = deletePage.deleteUser(userId);
+        LoggerLoad.info("Response Status Code: " + statusCode);
+        LoggerLoad.info("Response Status Line: " + statusLine);
+        LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
+        LoggerLoad.info("Response Body: " + responseBody);
 
-        // Assertions
-        if (testCase.contains("Positive")) {
-            Assert.assertEquals(response.getStatusCode(), 200, "✅ User should be deleted successfully!");
-            System.out.println("✅ User successfully deleted: " + response.asString());
-        } else if (testCase.contains("Negative")) {
-            Assert.assertNotEquals(response.getStatusCode(), 200, "❌ User deletion should fail!");
-            System.out.println("❌ Expected failure - Delete unsuccessful: " + response.asString());
+        // Assert Status Code
+        Assert.assertEquals(statusCode, expectedStatusCode, "Unexpected Status Code!");
+
+        // Assert Status Line
+        Assert.assertTrue(statusLine.contains(String.valueOf(expectedStatusCode)),
+        	    "Unexpected Status Line! Expected: " + expectedStatusCode + " but got: " + statusLine);
+
+        // Validate Headers
+        Assert.assertEquals(response.getHeader("Content-Type"), "application/json", "Invalid Content-Type!");
+        Assert.assertNotNull(response.getHeader("Server"), "Server header is missing!");
+
+        if (testCaseName.contains("Positive")) {
+            LoggerLoad.info("Expected Success for Test: " + testCaseName);
+
+            // Validate Success Response
+            Assert.assertEquals(response.jsonPath().getString("status"), "Success", "Status mismatch!");
+            Assert.assertEquals(response.jsonPath().getString("message"), "User is deleted successfully", "Message mismatch!");
+
+            // JSON Schema Validation
+            response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(DELETE_USER_SCHEMA_PATH)));
+
+        } else {
+            LoggerLoad.info("Expected Failure for Test: " + testCaseName);
+
+            // Validate Error Message for 400/404
+            String actualErrorMessage = response.jsonPath().getString("message");
+            Assert.assertTrue(actualErrorMessage.contains("Invalid User ID") || 
+                              actualErrorMessage.contains("Bad Request") || 
+                              actualErrorMessage.contains("User does not exist"),
+                "Error message mismatch! Expected 'Invalid User ID' or 'User does not exist' but got: " + actualErrorMessage);
+
+            // JSON Schema Validation
+            response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(DELETE_USER_SCHEMA_PATH)));
         }
+
+        LoggerLoad.info("Test Completed: " + testCaseName);
     }
 }

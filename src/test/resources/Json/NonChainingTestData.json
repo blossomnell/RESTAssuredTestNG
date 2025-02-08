@@ -1,16 +1,16 @@
 [
     {
         "test_case": "Create User - Positive",
-        "user_first_name": "resi",
-        "user_last_name": "peli",
-        "user_contact_number": "2219993022",
-        "user_email_id": "resi.peli@example.com",
+        "user_first_name": "missy",
+        "user_last_name": "saakis",
+        "user_contact_number": "6666994477",
+        "user_email_id": "missy.saaki@example.com",
         "userAddress": {
             "plotNumber": "A-123",
             "street": "Maple Street",
             "state": "CA",
             "country": "USA",
-            "zipCode": "65432"
+            "zipCode": "54321"
         }
     },
     {
@@ -39,7 +39,7 @@
         "test_case": "Update User - Positive",
         "user_id": "18548",
         "user_first_name": "fasfafs",
-        "user_last_name": "Notdon",
+        "user_last_name": "NotdonUpdated",
         "user_contact_number": "9003114004",
         "user_email_id": "lfhgfdd.den@gmail.com",
         "userAddress": {
@@ -47,7 +47,7 @@
             "street": "scsscsa",
             "state": "csacsc",
             "country": "scsdvsdv",
-            "zipCode": "227788"
+            "zipCode": "45588"
         }
     },
     {
@@ -57,10 +57,10 @@
     },
     {
         "test_case": "Delete User - Positive",
-        "user_first_name": "Keannuu"
+        "user_first_name": "missy"
     },
     {
         "test_case": "Delete User - Negative (Invalid User ID)",
-        "user_id": "INVALID_USER_9999"
+        "user_id": "10AB701"
     }
 ]

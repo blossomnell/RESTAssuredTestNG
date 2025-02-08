@@ -18,6 +18,7 @@
 <!--            <class name="Tests.POSTTest"/>-->
 <!--            <class name="Tests.GETTest"/>-->
 <!--            <class name="Tests.PUTTest"/>-->
+<!--            <class name="Tests.DELETETest"/>-->
 <!--        </classes>-->
 <!--    </test>-->
 
