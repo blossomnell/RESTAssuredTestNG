@@ -1,0 +1,13 @@
+{
+    "user_first_name": "zee",
+    "user_last_name": "zal",
+    "user_contact_number": "8886100999",
+    "user_email_id": "zee.zal@yahoo.com",
+    "userAddress": {
+        "plotNumber": "A1-789",
+        "street": "Sunset Blvd",
+        "state": "CA",
+        "country": "USA",
+        "zipCode": "90001"
+    }
+}

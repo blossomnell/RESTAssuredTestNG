@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="APITestSuite" parallel="false" thread-count="2">
+   
+    <listeners>
+        <listener class-name="org.testng.reporters.XMLReporter"/>
+        <listener class-name="Utilities.TestListener"/>
+    </listeners>
+  
+    <test name="API_Chaining_Tests">
+        <classes>
+            <class name="Tests.APIChainingTest"/>
+        </classes>
+    </test>
+    
+<!--    <test name="NonChaining_Tests">-->
+<!--        <classes>-->
+<!--            <class name="Tests.POSTTest"/>-->
+<!--            <class name="Tests.GETTest"/>-->
+<!--            <class name="Tests.PUTTest"/>-->
+<!--            <class name="Tests.DELETETest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+</suite>

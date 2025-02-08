@@ -1,0 +1,66 @@
+[
+    {
+        "test_case": "Create User - Positive",
+        "user_first_name": "missy",
+        "user_last_name": "saakis",
+        "user_contact_number": "6666994477",
+        "user_email_id": "missy.saaki@example.com",
+        "userAddress": {
+            "plotNumber": "A-123",
+            "street": "Maple Street",
+            "state": "CA",
+            "country": "USA",
+            "zipCode": "54321"
+        }
+    },
+    {
+        "test_case": "Create User - Negative (Alphanumeric First Name)",
+        "user_first_name": "John123",
+        "user_last_name": "Doo",
+        "user_contact_number": "9870043210",
+        "user_email_id": "invalid.email@example.com",
+        "userAddress": {
+            "plotNumber": "X-001",
+            "street": "Invalid Lane",
+            "state": "NY",
+            "country": "USA",
+            "zipCode": "10001"
+        }
+    },
+    {
+        "test_case": "Get User - Positive",
+        "user_first_name": "Jonnie"
+    },
+    {
+        "test_case": "Get User - Negative (Wrong Endpoint)",
+        "wrong_endpoint": "/api/getuserdetails"
+    },
+    {
+        "test_case": "Update User - Positive",
+        "user_id": "18548",
+        "user_first_name": "fasfafs",
+        "user_last_name": "NotdonUpdated",
+        "user_contact_number": "9003114004",
+        "user_email_id": "lfhgfdd.den@gmail.com",
+        "userAddress": {
+            "plotNumber": "abc-123",
+            "street": "scsscsa",
+            "state": "csacsc",
+            "country": "scsdvsdv",
+            "zipCode": "45588"
+        }
+    },
+    {
+        "test_case": "Update User - Negative (Special Characters in First Name)",
+        "user_id": "15218",
+        "user_first_name": "kanlakmagm@@@"
+    },
+    {
+        "test_case": "Delete User - Positive",
+        "user_first_name": "missy"
+    },
+    {
+        "test_case": "Delete User - Negative (Invalid User ID)",
+        "user_id": "10AB701"
+    }
+]
