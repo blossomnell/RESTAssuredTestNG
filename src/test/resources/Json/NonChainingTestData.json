@@ -39,7 +39,7 @@
         "test_case": "Update User - Positive",
         "user_id": "18548",
         "user_first_name": "fasfafs",
-        "user_last_name": "Notdon",
+        "user_last_name": "NotdonUpdated",
         "user_contact_number": "9003114004",
         "user_email_id": "lfhgfdd.den@gmail.com",
         "userAddress": {
@@ -47,7 +47,7 @@
             "street": "scsscsa",
             "state": "csacsc",
             "country": "scsdvsdv",
-            "zipCode": "86677"
+            "zipCode": "10077"
         }
     },
     {
