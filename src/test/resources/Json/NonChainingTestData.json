@@ -37,17 +37,17 @@
     },
     {
         "test_case": "Update User - Positive",
-        "user_id": "18548",
-        "user_first_name": "fasfafs",
-        "user_last_name": "Notdon",
-        "user_contact_number": "9003114004",
-        "user_email_id": "lfhgfdd.den@gmail.com",
+        "user_id": "2765",
+        "user_first_name": "jkgdfdjkksdkv",
+        "user_last_name": "nameUpdate12",
+        "user_contact_number": "6699177778",
+        "user_email_id": "thvvveb@gmail.com",
         "userAddress": {
-            "plotNumber": "abc-123",
-            "street": "scsscsa",
-            "state": "csacsc",
-            "country": "scsdvsdv",
-            "zipCode": "19977"
+            "plotNumber": "pl-23",
+            "street": "my Street",
+            "state": "Texas",
+            "country": "USA",
+            "zipCode": "18604"
         }
     },
     {
