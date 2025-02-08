@@ -17,7 +17,7 @@ public class POSTTest {
     private static final String CREATE_USER_SCHEMA_PATH = "src/test/resources/schemas/CreateUserSchema.json";
 
     @SuppressWarnings("unchecked")
-	@Test(dataProvider = "PostData", dataProviderClass = TestDataProvider.class)
+	@Test(priority=5, dataProvider = "PostData", dataProviderClass = TestDataProvider.class)
     public void testCreateUser(JSONObject testData) {
         String testCaseName = (String) testData.get("test_case");
 
