@@ -9,18 +9,17 @@ import Utilities.LoggerLoad;
 public class PUTPage {
 
     private static final String UPDATE_USER_ENDPOINT = "/uap/updateuser/{userId}";
-
-  
+ 
     public Response updateUser(String userId, Object updateUserPayload) {
         LoggerLoad.info("Sending PUT request to update user with ID: " + userId);
         LoggerLoad.info("Request Payload: " + updateUserPayload.toString());
 
-        // Create a fresh request spec to avoid conflicts
+        // was getting conflicts so created a fresh request spec to avoid conflicts
         RequestSpecification requestSpec = RestAssured.given()
-                .baseUri(RestAssured.baseURI) // Use base URI from BaseTest
-                .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword()) // Authentication
-                .header("Content-Type", "application/json") // Ensure JSON content type
-                .pathParam("userId", userId); // Set only userId
+                .baseUri(RestAssured.baseURI) 
+                .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword()) 
+                .header("Content-Type", "application/json") 
+                .pathParam("userId", userId); 
 
         // Perform PUT request
         Response response = requestSpec
@@ -36,20 +35,18 @@ public class PUTPage {
 
         return response;
     }
-
    
     public Response updateUserWithInvalidData(String userId, Object invalidUserPayload) {
         LoggerLoad.info("Sending PUT request with invalid data for user ID: " + userId);
         LoggerLoad.info("Request Payload: " + invalidUserPayload.toString());
 
-        // Create a fresh request spec to avoid conflicts
         RequestSpecification requestSpec = RestAssured.given()
-                .baseUri(RestAssured.baseURI) // Use base URI from BaseTest
-                .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword()) // Authentication
-                .header("Content-Type", "application/json") // Ensure JSON content type
-                .pathParam("userId", userId); // Set only userId
+                .baseUri(RestAssured.baseURI) 
+                .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword()) 
+                .header("Content-Type", "application/json") 
+                .pathParam("userId", userId); 
 
-        // Perform PUT request
+        
         Response response = requestSpec
                 .body(invalidUserPayload)
                 .when()

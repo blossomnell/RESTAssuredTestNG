@@ -18,10 +18,10 @@ public class GETTest {
 
     @Test(priority=6, dataProvider = "GetData", dataProviderClass = TestDataProvider.class)
     public void testGetUser(JSONObject testData) {
-        // Extract test case name
+        
         String testCaseName = (String) testData.get("test_case");
 
-        // Skip non-GET test cases
+        
         if (!testCaseName.startsWith("Get User")) {
             throw new SkipException("Skipping non-GET test: " + testCaseName);
         }
@@ -47,9 +47,9 @@ public class GETTest {
         String responseBody = response.getBody().asString();
 
         // Extract only status code from status line (removes HTTP part)
-        String extractedStatusCode = statusLine.split(" ")[1]; // Extracts the status code from "HTTP/1.1 200"
+        String extractedStatusCode = statusLine.split(" ")[1]; // 
 
-        // Log response details
+        
         LoggerLoad.info("Response Status Code: " + statusCode);
         LoggerLoad.info("Extracted Status Code from Status Line: " + extractedStatusCode);
         LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
@@ -58,35 +58,35 @@ public class GETTest {
         if (testCaseName.contains("Positive")) {
             LoggerLoad.info("Expected Success for Test: " + testCaseName);
             
-            // **Status Code Validation**
+            
             Assert.assertEquals(statusCode, 200, "Expected 200 OK, but got: " + statusCode);
             
-            // **Status Line Validation (Without HTTP Part)**
+            
             Assert.assertEquals(extractedStatusCode, "200", "Unexpected Status Code in Status Line!");
 
-            // **Header Validations**
+           
             Assert.assertEquals(response.getHeader("Content-Type"), "application/json",
                     "Unexpected Content-Type in response");
             Assert.assertNotNull(response.getHeader("Server"), "Server header is missing");
 
-            // **Data Validation**
+            
             Assert.assertNotNull(responseBody, "Response body is empty!");
             Assert.assertTrue(responseBody.contains("\"user_first_name\":\"" + userFirstName + "\""),
                     "Expected user details in response but got: " + responseBody);
 
-            // **JSON Schema Validation**
+            
             response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(GET_USER_SCHEMA_PATH)));
 
         } else if (testCaseName.contains("Negative")) {
             LoggerLoad.info("Expected Failure for Test: " + testCaseName);
             
-            // **Status Code Validation**
+            
             Assert.assertNotEquals(statusCode, 200, "Expected failure but received 200 OK!");
 
-            // **Status Line Validation (Without HTTP Part)**
+            
             Assert.assertNotEquals(extractedStatusCode, "200", "Unexpected Success in Status Line!");
 
-            // **Error Message Validation**
+            
             Assert.assertTrue(statusCode == 404 || responseBody.toLowerCase().contains("not found") 
                     || responseBody.toLowerCase().contains("error"),
                     "Expected failure message in response but got: " + responseBody);
