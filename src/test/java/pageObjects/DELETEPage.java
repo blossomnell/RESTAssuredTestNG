@@ -8,23 +8,21 @@ import Utilities.LoggerLoad;
 
 public class DELETEPage {
 
-    private static final String DELETE_USER_ENDPOINT = "/uap/deleteuser/username/{userFirstName}"; // ✅ Corrected DELETE endpoint
-    private static final String GET_USER_ENDPOINT = "/uap/users/username/{userFirstName}"; // ✅ Corrected GET endpoint
+    private static final String DELETE_USER_ENDPOINT = "/uap/deleteuser/username/{userFirstName}";
+    private static final String GET_USER_ENDPOINT = "/uap/users/username/{userFirstName}"; 
 
     // DELETE by User First Name (Positive Scenario)
     public Response deleteUserByFirstName(String userFirstName) {
         LoggerLoad.info("Checking if user exists before deletion: " + userFirstName);
-
-        // Step 1: Perform GET request before DELETE
+     
         Response getUserResponse = getUserByFirstName(userFirstName);
         if (getUserResponse.getStatusCode() != 200) {
             LoggerLoad.error("User not found before DELETE! Skipping delete operation.");
-            return getUserResponse; // Returning GET response to indicate failure
+            return getUserResponse; 
         }
 
-        LoggerLoad.info("🗑Sending DELETE request for user: " + userFirstName);
-
-        // Step 2: Perform DELETE request
+        LoggerLoad.info("Sending DELETE request for user: " + userFirstName);
+       
         RequestSpecification requestSpec = RestAssured.given()
                 .baseUri(RestAssured.baseURI)
                 .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword()) 
@@ -77,7 +75,8 @@ public class DELETEPage {
         return response;
     }
 
-    // GET user before DELETE (to confirm existence)
+    // this is the actual method that sends request to API. 
+    //the first GET calls the 2nd method to check whether user exists before DELETE 
     public Response getUserByFirstName(String userFirstName) {
         LoggerLoad.info("Performing GET request for user: " + userFirstName);
 

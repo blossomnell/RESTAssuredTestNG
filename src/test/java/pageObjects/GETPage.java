@@ -28,7 +28,7 @@ public class GETPage {
     public Response getUserWithWrongEndpoint(String wrongEndpoint) {
         LoggerLoad.info("Sending GET request to wrong endpoint: " + wrongEndpoint);
 
-        // Use RestAssured directly instead of BaseTest.requestSpec to prevent path parameter issues
+        
         Response response = RestAssured.given()
                 .when()
                 .get(wrongEndpoint)

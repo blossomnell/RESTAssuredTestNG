@@ -4,8 +4,7 @@
    
     <listeners>
         <listener class-name="org.testng.reporters.XMLReporter"/>
-        <listener class-name="Utilities.TestListener"/>
-        <!-- Add Allure Listener -->
+        <listener class-name="Utilities.TestListener"/>      
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
   

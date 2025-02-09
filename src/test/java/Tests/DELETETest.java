@@ -31,13 +31,13 @@ public class DELETETest {
         String expectedStatusLine;
 
         if (testCaseName.contains("Positive")) {
-            // DELETE by First Name (Positive Case)
+            // DELETE by First Name 
             String userFirstName = (String) testData.get("user_first_name");
             if (userFirstName == null || userFirstName.isEmpty()) {
                 throw new IllegalArgumentException("user_first_name is missing in test data!");
             }
 
-            // Step 1: Perform GET request before DELETE to confirm user exists
+            // Perform GET request before DELETE to confirm user exists
             LoggerLoad.info("Performing GET request before DELETE for user: " + userFirstName);
             Response getUserResponse = deletePage.getUserByFirstName(userFirstName);
             int getUserStatusCode = getUserResponse.getStatusCode();
@@ -50,13 +50,13 @@ public class DELETETest {
                 Assert.fail("GET request failed. User '" + userFirstName + "' does not exist.");
             }
 
-            // Step 2: Proceed with DELETE only if GET is successful
-            LoggerLoad.info("🗑Sending DELETE request for user: " + userFirstName);
+            // Proceed with DELETE only if GET is successful
+            LoggerLoad.info("Sending DELETE request for user: " + userFirstName);
             response = deletePage.deleteUserByFirstName(userFirstName);
             expectedStatusCode = 200;
             expectedStatusLine = "200 OK";
 
-            // Step 3: Verify user is actually deleted
+            // Verify user is actually deleted
             LoggerLoad.info("Performing GET request after DELETE to verify user deletion: " + userFirstName);
             Response getAfterDelete = deletePage.getUserByFirstName(userFirstName);
             Assert.assertEquals(getAfterDelete.getStatusCode(), 404, "User still exists after DELETE!");
@@ -72,7 +72,7 @@ public class DELETETest {
             LoggerLoad.info("Sending DELETE request with INVALID User ID: " + invalidUserId);
             response = deletePage.deleteUserByInvalidId(invalidUserId);
 
-            // Handle both 400 and 404 responses
+            // sometimes i got 400 and 404 so we include both
             int statusCode = response.getStatusCode();
             if (statusCode == 400) {
                 expectedStatusCode = 400;
@@ -97,38 +97,38 @@ public class DELETETest {
         LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
         LoggerLoad.info("Response Body: " + responseBody);
 
-        // Assert Status Code
+        
         Assert.assertEquals(statusCode, expectedStatusCode, "Unexpected Status Code!");
 
-        // Assert Status Line
+        
         Assert.assertTrue(statusLine.contains(String.valueOf(expectedStatusCode)),
         	    "Unexpected Status Line! Expected: " + expectedStatusCode + " but got: " + statusLine);
 
-        // Validate Headers
+        
         Assert.assertEquals(response.getHeader("Content-Type"), "application/json", "Invalid Content-Type!");
         Assert.assertNotNull(response.getHeader("Server"), "Server header is missing!");
 
         if (testCaseName.contains("Positive")) {
             LoggerLoad.info("Expected Success for Test: " + testCaseName);
 
-            // Validate Success Response
+            
             Assert.assertEquals(response.jsonPath().getString("status"), "Success", "Status mismatch!");
             Assert.assertEquals(response.jsonPath().getString("message"), "User is deleted successfully", "Message mismatch!");
 
-            // JSON Schema Validation
+            
             response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(DELETE_USER_SCHEMA_PATH)));
 
         } else {
             LoggerLoad.info("Expected Failure for Test: " + testCaseName);
 
-            // Validate Error Message for 400/404
+            
             String actualErrorMessage = response.jsonPath().getString("message");
             Assert.assertTrue(actualErrorMessage.contains("Invalid User ID") || 
                               actualErrorMessage.contains("Bad Request") || 
                               actualErrorMessage.contains("User does not exist"),
                 "Error message mismatch! Expected 'Invalid User ID' or 'User does not exist' but got: " + actualErrorMessage);
 
-            // JSON Schema Validation
+           
             response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(DELETE_USER_SCHEMA_PATH)));
         }
 

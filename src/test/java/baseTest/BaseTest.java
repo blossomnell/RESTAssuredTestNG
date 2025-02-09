@@ -19,7 +19,7 @@ public class BaseTest {
 
             requestSpec = RestAssured.given()
                     .auth().preemptive().basic(ConfigReader.getUsername(), ConfigReader.getPassword())
-                    .header("Content-Type", "application/json"); // Ensure JSON is used
+                    .header("Content-Type", "application/json"); 
 
             LoggerLoad.info("RestAssured Request Specification Initialized Successfully");
 

@@ -31,11 +31,11 @@ public class POSTTest {
         // Send POST request
         Response response = postPage.createUser(testData);
 
-        // Extract response details
+        
         int statusCode = response.getStatusCode();
         String responseBody = response.getBody().asString();
 
-        // Log response details
+       
         LoggerLoad.info("Response Status Code: " + statusCode);
         LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
         LoggerLoad.info("Response Body: " + responseBody);
@@ -43,15 +43,15 @@ public class POSTTest {
         if (testCaseName.contains("Positive")) {
             LoggerLoad.info("Expected Success for Test: " + testCaseName);
 
-            // **Status Code Validation (Simplified)**
+            
             Assert.assertEquals(statusCode, 201, "Expected 201 Created, but got: " + statusCode);
 
-            // **Header Validations**
+            
             Assert.assertEquals(response.getHeader("Content-Type"), "application/json",
                     "Unexpected Content-Type in response");
             Assert.assertNotNull(response.getHeader("Server"), "Server header is missing");
 
-            // ✔ **Data Validation**
+            
             String userId = response.jsonPath().getString("user_id");
             String firstName = response.jsonPath().getString("user_first_name");
 
@@ -60,16 +60,16 @@ public class POSTTest {
             Assert.assertEquals(firstName, testData.get("user_first_name"),
                     "Mismatch in created user first name!");
 
-            // **JSON Schema Validation (Only for Successful Requests)**
+            
             response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(CREATE_USER_SCHEMA_PATH)));
 
         } else if (testCaseName.contains("Negative")) {
             LoggerLoad.info("Expected Failure for Test: " + testCaseName);
 
-            // **Status Code Validation**
+            
             Assert.assertNotEquals(statusCode, 201, "Expected failure but received 201 Created!");
 
-            // **Error Message Validation**
+            
             Assert.assertTrue(responseBody.contains("status"),
                     "Expected error response with 'status' field, but got: " + responseBody);
             Assert.assertTrue(responseBody.contains("message"),

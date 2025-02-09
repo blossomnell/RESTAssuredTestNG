@@ -27,7 +27,7 @@ public class PUTTest {
 
         LoggerLoad.info("Running Test Case: " + testCaseName);
 
-        // Extract user ID
+        
         String userId = (String) testData.get("user_id");
         if (userId == null) {
             throw new IllegalArgumentException("user_id is missing in test data!");
@@ -44,7 +44,7 @@ public class PUTTest {
         String statusLine = response.getStatusLine().trim(); // Trim to handle extra spaces
         String responseBody = response.getBody().asString();
 
-        // Log response details
+        
         LoggerLoad.info("Response Status Code: " + statusCode);
         LoggerLoad.info("Response Status Line: " + statusLine);
         LoggerLoad.info("Response Headers: " + response.getHeaders().asList());
@@ -53,34 +53,34 @@ public class PUTTest {
         if (testCaseName.contains("Positive")) {
             LoggerLoad.info("Expected Success for Test: " + testCaseName);
 
-            // **Status Code Validation**
+            
             Assert.assertEquals(statusCode, 200, "Expected 200 OK, but got: " + statusCode);
 
-            // **Status Line Validation (Removes "HTTP/1.1" and checks only status code)**
+            
             Assert.assertTrue(statusLine.contains("200"), "Unexpected Status Line: " + statusLine);
 
-            // **Header Validations**
+            
             Assert.assertEquals(response.getHeader("Content-Type"), "application/json", "Invalid Content-Type");
             Assert.assertNotNull(response.getHeader("Server"), "Server header is missing");
 
-            // **Data Validation**
+            
             Assert.assertEquals(response.jsonPath().getString("user_first_name"), testData.get("user_first_name"), "First name mismatch!");
             Assert.assertEquals(response.jsonPath().getString("user_last_name"), testData.get("user_last_name"), "Last name mismatch!");
             Assert.assertEquals(response.jsonPath().getString("user_email_id"), testData.get("user_email_id"), "Email mismatch!");
 
-            // **JSON Schema Validation**
+            
             response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(UPDATE_USER_SCHEMA_PATH)));
 
         } else if (testCaseName.contains("Negative")) {
             LoggerLoad.info("Expected Failure for Test: " + testCaseName);
 
-            // **Status Code Validation**
+            
             Assert.assertEquals(statusCode, 400, "Expected 400 BAD_REQUEST, but got: " + statusCode);
 
-            // **Status Line Validation (Removes "HTTP/1.1" and checks only status code)**
+            
             Assert.assertTrue(statusLine.contains("400"), "Unexpected Status Line: " + statusLine);
 
-            // **Error Message Validation (Allows minor variations)**
+            
             String actualErrorMessage = response.jsonPath().getString("message");
             Assert.assertTrue(actualErrorMessage.toLowerCase().contains("user first name is mandatory"),
                     "Error message mismatch! Expected part of: 'User First Name is mandatory...' but found: " + actualErrorMessage);

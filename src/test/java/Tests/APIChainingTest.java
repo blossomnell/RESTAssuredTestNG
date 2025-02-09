@@ -23,7 +23,7 @@ public class APIChainingTest {
         LoggerLoad.info("API Chaining Test Suite Initialized.");
     }
 
-    // Step 1: Creating the User
+    // Creating the User
     @Test(priority = 1)
     public void testCreateUser() {
         Map<String, Object> userData = JsonDataReader.getChainingTestData();
@@ -33,29 +33,29 @@ public class APIChainingTest {
         Response response = apiChainingPage.createUser(userData);
         long endTime = System.currentTimeMillis();
 
-        // Validate Status Code
+        
         Assert.assertEquals(response.getStatusCode(), 201, "User creation failed! Status: " + response.getStatusCode());
 
-        // Validate Status Line
+        
         Assert.assertTrue(response.getStatusLine().contains("201"), "Status Line Mismatch! Found: " + response.getStatusLine());
 
-        // Validate Headers
+        
         Assert.assertNotNull(response.getHeader("Content-Type"), "Missing Content-Type header!");
 
-        // Validate Response Body
+        
         userId = response.jsonPath().getString("user_id");
         firstName = response.jsonPath().getString("user_first_name");
         Assert.assertNotNull(userId, "user_id is null!");
         Assert.assertNotNull(firstName, "firstName is null!");
 
-        // Validate Schema
+        
         response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/CreateUserSchema.json"));
 
         LoggerLoad.info("User Created Successfully - ID: " + userId + ", Name: " + firstName);
         LoggerLoad.info("Response Time: " + (endTime - startTime) + " ms");
     }
 
-    // Step 2: Retrieving the user
+    // Retrieving the user
     @Test(priority = 2, dependsOnMethods = "testCreateUser")
     public void testGetUser() {
         Assert.assertNotNull(firstName, "First Name is null before GET operation!");
@@ -65,17 +65,17 @@ public class APIChainingTest {
         Response response = apiChainingPage.getUser(firstName);
         long endTime = System.currentTimeMillis();
 
-        // Validate Status Code
+        
         Assert.assertEquals(response.getStatusCode(), 200, "User retrieval failed! Status: " + response.getStatusCode());
 
-        // Validate Schema
+        
         response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/GetUserSchema.json"));
 
         LoggerLoad.info("User Retrieved: ID=" + response.jsonPath().getString("user_id") + ", Name=" + response.jsonPath().getString("user_first_name"));
         LoggerLoad.info("Response Time: " + (endTime - startTime) + " ms");
     }
 
-    // Step 3: Updating the user
+    
     @Test(priority = 3, dependsOnMethods = "testGetUser")
     public void testUpdateUser() {
         Assert.assertNotNull(userId, "User ID is null before UPDATE operation!");
@@ -88,11 +88,11 @@ public class APIChainingTest {
         updateData.put("user_email_id", userData.get("user_email_id"));
         updateData.put("user_contact_number", userData.get("user_contact_number"));
 
-        // Dynamically update last name
+        
         String updatedLastName = userData.get("user_last_name") + "Updated";
         updateData.put("user_last_name", updatedLastName);
 
-        // Update zipCode inside userAddress safely
+        
         Object addressObj = userData.get("userAddress");
         String expectedZipCode = null;
 
@@ -117,10 +117,10 @@ public class APIChainingTest {
         Response response = apiChainingPage.updateUser(userId, updateData);
         long endTime = System.currentTimeMillis();
 
-        // Validate Status Code
+        
         Assert.assertEquals(response.getStatusCode(), 200, "User update failed! Status: " + response.getStatusCode());
 
-        // Validate Schema
+        
         response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/UpdateUserSchema.json"));
 
         String responseLastName = response.jsonPath().getString("user_last_name");
@@ -133,7 +133,7 @@ public class APIChainingTest {
         LoggerLoad.info("Response Time: " + (endTime - startTime) + " ms");
     }
 
-    // Step 4: Deleting the user
+    // Deleting the user
     @Test(priority = 4, dependsOnMethods = "testUpdateUser")
     public void testDeleteUser() {
         Assert.assertNotNull(firstName, "First Name is null before DELETE operation!");
@@ -143,10 +143,10 @@ public class APIChainingTest {
         Response response = apiChainingPage.deleteUser(firstName);
         long endTime = System.currentTimeMillis();
 
-        // Validate Status Code
+        
         Assert.assertEquals(response.getStatusCode(), 200, "User deletion failed! Status: " + response.getStatusCode());
 
-        // Validate Schema
+        
         response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/DeleteUserSchema.json"));
 
         LoggerLoad.info("User Deleted Successfully!");
