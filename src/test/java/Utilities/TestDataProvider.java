@@ -4,7 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,9 +15,9 @@ import org.testng.annotations.DataProvider;
 public class TestDataProvider {
 
     private static final String NON_CHAINING_JSON = ConfigReader.getNonChainingJsonPath();
-    private static List<JSONObject> testDataList = new ArrayList<>(); // Store test data in memory
+    private static List<JSONObject> testDataList = new ArrayList<>(); 
 
-    // Reads JSON once and stores data in a list
+    
     static {
         if (NON_CHAINING_JSON == null || NON_CHAINING_JSON.isEmpty()) {
             throw new RuntimeException("Error: JSON file path is null or empty in ConfigReader.");
@@ -33,7 +33,8 @@ public class TestDataProvider {
            
             System.out.println("Loaded Test Cases from JSON:");
             for (JSONObject jsonObject : testDataList) {
-                System.out.println("   ➤ " + jsonObject.get("test_case"));
+            	System.out.println("Test Case: " + jsonObject.get("test_case"));
+
             }
 
         } catch (IOException | ParseException e) {
@@ -41,15 +42,24 @@ public class TestDataProvider {
         }
     }
 
-   
+
     private static Object[][] filterTestCases(String prefix) {
-        List<JSONObject> filteredCases = testDataList.stream()
-            .filter(data -> ((String) data.get("test_case")).startsWith(prefix))
-            .collect(Collectors.toList()); // Java 8+ compatibility
+        List<JSONObject> filteredCases = new ArrayList<>();
 
-        return filteredCases.stream().map(data -> new Object[]{data}).toArray(Object[][]::new);
+        for (JSONObject data : testDataList) {
+            String testCase = (String) data.get("test_case");
+            if (testCase.startsWith(prefix)) {
+                filteredCases.add(data);
+            }
+        }
+
+        Object[][] testDataArray = new Object[filteredCases.size()][1];
+        for (int i = 0; i < filteredCases.size(); i++) {
+            testDataArray[i][0] = filteredCases.get(i);
+        }
+
+        return testDataArray;
     }
-
     
     @DataProvider(name = "PostData")
     public Object[][] getPostData() {

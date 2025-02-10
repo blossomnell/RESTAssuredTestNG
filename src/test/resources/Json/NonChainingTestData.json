@@ -39,7 +39,7 @@
         "test_case": "Update User - Positive",
         "user_id": "2765",
         "user_first_name": "jkgdfdjkksdkv",
-        "user_last_name": "nameUpdated",
+        "user_last_name": "nameUpdatedAgain",
         "user_contact_number": "6699177778",
         "user_email_id": "thvvveb@gmail.com",
         "userAddress": {
@@ -47,7 +47,7 @@
             "street": "my Street",
             "state": "Texas",
             "country": "USA",
-            "zipCode": "77777"
+            "zipCode": "11157"
         }
     },
     {
