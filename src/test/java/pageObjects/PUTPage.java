@@ -21,7 +21,7 @@ public class PUTPage {
                 .header("Content-Type", "application/json") 
                 .pathParam("userId", userId); 
 
-        // Perform PUT request
+        
         Response response = requestSpec
                 .body(updateUserPayload)
                 .when()

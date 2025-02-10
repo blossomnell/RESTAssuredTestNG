@@ -11,7 +11,7 @@ public class DELETEPage {
     private static final String DELETE_USER_ENDPOINT = "/uap/deleteuser/username/{userFirstName}";
     private static final String GET_USER_ENDPOINT = "/uap/users/username/{userFirstName}"; 
 
-    // DELETE by User First Name (Positive Scenario)
+    // Positive Scenario
     public Response deleteUserByFirstName(String userFirstName) {
         LoggerLoad.info("Checking if user exists before deletion: " + userFirstName);
      
@@ -45,7 +45,7 @@ public class DELETEPage {
         return response;
     }
 
-    // DELETE by Invalid User ID (Negative Scenario)
+    // Negative Scenario
     public Response deleteUserByInvalidId(String invalidUserFirstName) {
         LoggerLoad.info("Attempting to DELETE a non-existent user: " + invalidUserFirstName);
 

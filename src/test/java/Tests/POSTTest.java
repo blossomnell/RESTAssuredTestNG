@@ -21,7 +21,7 @@ public class POSTTest {
     public void testCreateUser(JSONObject testData) {
         String testCaseName = (String) testData.get("test_case");
 
-        // Ensure only POST-related tests run
+        // only POST-related tests run
         if (!testCaseName.startsWith("Create User")) {
             throw new SkipException("Skipping non-POST test: " + testCaseName);
         }
