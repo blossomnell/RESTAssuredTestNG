@@ -14,7 +14,7 @@ public class APIChainingPage {
  
     public Response createUser(Object payload) {
         Response response = given()
-                .spec(BaseTest.requestSpec) 
+                .spec(BaseTest.requestSpec) //avoids baseURI, authentication in every test, evry rqst follows the same config
                 .contentType("application/json")
                 .body(payload)
                 .when()
