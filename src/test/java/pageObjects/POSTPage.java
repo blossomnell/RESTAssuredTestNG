@@ -14,11 +14,9 @@ public class POSTPage {
     	//string-username object-realvalue payload is the data sent to API
         // we convert Map to JSONObject bcoz RESTassured need body in json format
         JSONObject requestBody = new JSONObject(payload);
-
-        
+       
         LoggerLoad.info("Creating User with Payload: " + requestBody.toJSONString());
 
-        // Sending POST request
         Response response = BaseTest.requestSpec
                 .contentType("application/json")
                 .body(requestBody)
